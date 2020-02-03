@@ -6,7 +6,6 @@ import javax.validation.Valid;
 
 import com.raydovski.kanbanapi.dto.TaskDto;
 import com.raydovski.kanbanapi.dto.TaskSearchDto;
-import com.raydovski.kanbanapi.entity.User;
 import com.raydovski.kanbanapi.service.BoardService;
 import com.raydovski.kanbanapi.service.TaskService;
 import com.raydovski.kanbanapi.service.UserService;
@@ -23,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.ApiOperation;
@@ -52,15 +50,12 @@ public class TaskController {
         return this.taskService.get(searchDto);
     }
 
-    // @GetMapping("/{id}")
-    // @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get
-    // task for board")
-    // @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(),
-    // #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
-    // public TaskDto get(@PathVariable Long boardId, @PathVariable Long id,
-    // @ApiIgnore Authentication authentication) {
-    // return this.boardService.get(id);
-    // }
+    @GetMapping("/{id}")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get task for board")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
+    public TaskDto get(@PathVariable Long boardId, @PathVariable Long id, @ApiIgnore Authentication authentication) {
+        return this.taskService.get(boardId, id);
+    }
 
     @PostMapping
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Create task for board")
@@ -78,15 +73,12 @@ public class TaskController {
         return ResponseEntity.ok(this.taskService.edit(id, boardId, boardDto));
     }
 
-    // @DeleteMapping("/{id}")
-    // @ApiOperation(authorizations = @Authorization(value = "Bearer"), value =
-    // "Delete board")
-    // @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(),
-    // #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
-    // public ResponseEntity<?> delete(@PathVariable Long boardId, @PathVariable
-    // Long id,
-    // @ApiIgnore Authentication authentication) {
-    // this.boardService.delete(id);
-    // return new ResponseEntity<>(HttpStatus.OK);
-    // }
+    @DeleteMapping("/{id}")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get task for board")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
+    public ResponseEntity<?> delete(@PathVariable Long boardId, @PathVariable Long id,
+            @ApiIgnore Authentication authentication) {
+        this.taskService.delete(boardId, id);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

@@ -1,6 +1,5 @@
 package com.raydovski.kanbanapi.service;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,10 +58,26 @@ public class TaskService {
         return this.convertToDto(task);
     }
 
+    public void delete(Long boardId, Long id) {
+        Task task = this.getEntity(id);
+        if (!task.getBoard().getId().equals(boardId)) {
+            throw new EntityNotFoundException();
+        }
+        this.taskRepository.delete(task);
+    }
+
     public List<TaskDto> get(TaskSearchDto searchDto) {
         Specification<Task> specification = this.buildSpecification(searchDto);
         return this.taskRepository.findAll(specification).stream().map(t -> this.convertToDto(t))
                 .collect(Collectors.toList());
+    }
+
+    public TaskDto get(Long boardId, Long id) {
+        Task task = this.getEntity(id);
+        if (!task.getBoard().getId().equals(boardId)) {
+            throw new EntityNotFoundException();
+        }
+        return this.convertToDto(task);
     }
 
     public Task getEntity(Long id) {
@@ -86,6 +101,11 @@ public class TaskService {
 
     private Specification<Task> buildSpecification(TaskSearchDto dto) {
         return new Specification<Task>() {
+
+            /**
+             *
+             */
+            private static final long serialVersionUID = 4933170843652959896L;
 
             @Override
             public Predicate toPredicate(Root<Task> root, CriteriaQuery<?> query, CriteriaBuilder cb) {
