@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import com.raydovski.kanbanapi.dto.BoardDto;
@@ -81,7 +82,7 @@ public class BoardService {
     }
 
     public Board getEntity(Long id) {
-        return this.boardRepository.findById(id).orElseThrow();
+        return this.boardRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public Board convertToEntity(Board board, BoardDto dto) {

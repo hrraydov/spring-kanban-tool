@@ -81,13 +81,13 @@ public class TaskService {
     }
 
     public Task getEntity(Long id) {
-        return this.taskRepository.findById(id).orElseThrow();
+        return this.taskRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public Task convertToEntity(Task task, TaskDto dto) {
         BeanUtils.copyProperties(dto, task, "assignedTo", "phase");
         task.setAssignedTo(this.userService.get(dto.getAssignedTo().getId()));
-        task.setPhase(this.phaseRepository.findById(dto.getPhase().getId()).orElseThrow());
+        task.setPhase(this.phaseRepository.findById(dto.getPhase().getId()).orElseThrow(EntityNotFoundException::new));
         return task;
     }
 

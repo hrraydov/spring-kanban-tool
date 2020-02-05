@@ -1,5 +1,6 @@
 package com.raydovski.kanbanapi.service;
 
+import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
 import com.raydovski.kanbanapi.dto.Credentials;
@@ -36,11 +37,11 @@ public class UserService {
     }
 
     public User get(String email) {
-        return this.userRepository.findByEmail(email).orElseThrow();
+        return this.userRepository.findByEmail(email).orElseThrow(EntityNotFoundException::new);
     }
 
     public User get(Long id) {
-        return this.userRepository.findById(id).orElseThrow();
+        return this.userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public UserDto convertToDto(User user) {
