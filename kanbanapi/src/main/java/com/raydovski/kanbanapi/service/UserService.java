@@ -1,5 +1,8 @@
 package com.raydovski.kanbanapi.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.persistence.EntityNotFoundException;
 import javax.transaction.Transactional;
 
@@ -42,6 +45,10 @@ public class UserService {
 
     public User get(Long id) {
         return this.userRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+    }
+
+    public List<UserDto> searchByEmail(String email) {
+        return this.userRepository.findByEmailContaining(email).stream().map(u -> this.convertToDto(u)).collect(Collectors.toList());
     }
 
     public UserDto convertToDto(User user) {

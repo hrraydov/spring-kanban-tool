@@ -12,6 +12,7 @@ import com.raydovski.kanbanapi.security.TokenType;
 import com.raydovski.kanbanapi.service.UserService;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.Authorization;
 import springfox.documentation.annotations.ApiIgnore;
 
 @RestController
@@ -49,8 +52,10 @@ public class AuthenticationController {
     }
 
     @GetMapping(value = "/info")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get user info")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<UserDto> getUserInfo(@ApiIgnore Authentication authentication) {
-        User loggedInUser = this.userService.getUserFromAuthentication(authentication);
+        User loggedInUser = this.userService.get(authentication.getName());
         return ResponseEntity.ok(this.userService.convertToDto(loggedInUser));
     }
 

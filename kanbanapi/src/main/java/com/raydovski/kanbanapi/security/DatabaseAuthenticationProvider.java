@@ -15,7 +15,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Component
+@Slf4j
 public class DatabaseAuthenticationProvider implements AuthenticationProvider {
 
     @Resource
@@ -29,6 +32,7 @@ public class DatabaseAuthenticationProvider implements AuthenticationProvider {
         String password = String.valueOf(authentication.getCredentials());
         try {
             User user = userService.get(name);
+            log.info("DatabaseAuthenticationProvider#authenticate" + user);
             if (!passwordEncoder.matches(password, user.getPassword())) {
                 throw new BadCredentialsException("Password for user " + name + " does not match");
             }

@@ -21,7 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true, prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -43,7 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         "/**/*.css", "/**/*.js")
                 .permitAll().antMatchers("/swagger-ui.html").permitAll().antMatchers("/webjars/**").permitAll()
                 .antMatchers("/swagger-resources/**").permitAll().antMatchers("/v2/api-docs/**").permitAll()
-                .antMatchers("/boards/**").authenticated();
+                .antMatchers("/auth/login").permitAll().antMatchers("/auth/register").permitAll().antMatchers("/*/**").authenticated();
 
         http.addFilterBefore(jwtFilter(), UsernamePasswordAuthenticationFilter.class);
     }
