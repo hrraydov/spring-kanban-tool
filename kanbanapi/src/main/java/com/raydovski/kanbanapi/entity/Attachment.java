@@ -16,8 +16,8 @@ import lombok.NoArgsConstructor;
 public class Attachment {
 
     @Lob
-    private byte[] byteArray;
+    private byte[] data;
 
-    private String contentType;
+    private String name;
 
 }
