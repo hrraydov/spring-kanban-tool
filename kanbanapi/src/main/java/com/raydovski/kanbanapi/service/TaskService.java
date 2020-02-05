@@ -1,7 +1,12 @@
 package com.raydovski.kanbanapi.service;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityNotFoundException;
@@ -11,9 +16,11 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.transaction.Transactional;
 
+import com.raydovski.kanbanapi.dto.AttachmentDto;
 import com.raydovski.kanbanapi.dto.PhaseDto;
 import com.raydovski.kanbanapi.dto.TaskDto;
 import com.raydovski.kanbanapi.dto.TaskSearchDto;
+import com.raydovski.kanbanapi.entity.Attachment;
 import com.raydovski.kanbanapi.entity.Task;
 import com.raydovski.kanbanapi.repository.PhaseRepository;
 import com.raydovski.kanbanapi.repository.TaskRepository;
@@ -22,6 +29,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional
@@ -80,12 +88,39 @@ public class TaskService {
         return this.convertToDto(task);
     }
 
+    public void addAttachments(Long boardId, Long taskId, Set<MultipartFile> files) {
+        Task task = this.getEntity(taskId);
+        if (!task.getBoard().getId().equals(boardId)) {
+            throw new EntityNotFoundException();
+        }
+        task.getAttachments().addAll(files.stream().map(file -> {
+            try {
+                return Attachment.builder().contentType(file.getContentType()).data(file.getBytes())
+                        .id(UUID.randomUUID().toString()).name(file.getOriginalFilename()).build();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }).collect(Collectors.toSet()));
+        this.taskRepository.save(task);
+        System.err.println(task.getAttachments());
+    }
+
+    public Attachment getAttachment(Long boardId, Long taskId, String id) {
+        Task task = this.getEntity(taskId);
+        if (!task.getBoard().getId().equals(boardId)) {
+            throw new EntityNotFoundException();
+        }
+        return task.getAttachments().stream().filter(x -> x.getId().equals(id)).findFirst()
+                .orElseThrow(() -> new EntityNotFoundException());
+    }
+
     public Task getEntity(Long id) {
         return this.taskRepository.findById(id).orElseThrow(EntityNotFoundException::new);
     }
 
     public Task convertToEntity(Task task, TaskDto dto) {
-        BeanUtils.copyProperties(dto, task, "assignedTo", "phase");
+        BeanUtils.copyProperties(dto, task, "assignedTo", "phase", "attachments");
         task.setAssignedTo(this.userService.get(dto.getAssignedTo().getId()));
         task.setPhase(this.phaseRepository.findById(dto.getPhase().getId()).orElseThrow(EntityNotFoundException::new));
         return task;
@@ -93,9 +128,11 @@ public class TaskService {
 
     public TaskDto convertToDto(Task task) {
         TaskDto taskDto = new TaskDto();
-        BeanUtils.copyProperties(task, taskDto, "assignedTo", "phase");
+        BeanUtils.copyProperties(task, taskDto, "assignedTo", "phase", "attachments");
         taskDto.setPhase(PhaseDto.builder().id(task.getPhase().getId()).name(task.getPhase().getName()).build());
         taskDto.setAssignedTo(this.userService.convertToDto(task.getAssignedTo()));
+        taskDto.setAttachments(task.getAttachments().stream()
+                .map(att -> AttachmentDto.builder().id(att.getId()).build()).collect(Collectors.toSet()));
         return taskDto;
     }
 

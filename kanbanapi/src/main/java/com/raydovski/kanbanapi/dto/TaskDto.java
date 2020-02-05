@@ -3,8 +3,6 @@ package com.raydovski.kanbanapi.dto;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.raydovski.kanbanapi.entity.Attachment;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,7 +19,8 @@ public class TaskDto {
 
     private String description;
 
-    private Set<Attachment> attachments = new HashSet<>();
+    @Builder.Default
+    private Set<AttachmentDto> attachments = new HashSet<>();
 
     private UserDto assignedTo;
 

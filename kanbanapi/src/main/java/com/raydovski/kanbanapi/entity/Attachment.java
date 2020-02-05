@@ -15,9 +15,13 @@ import lombok.NoArgsConstructor;
 @Builder
 public class Attachment {
 
+    private String id;
+
     @Lob
     private byte[] data;
 
     private String name;
+
+    private String contentType;
 
 }
