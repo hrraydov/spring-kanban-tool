@@ -17,6 +17,7 @@ import com.raydovski.kanbanapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -90,7 +91,7 @@ public class TaskController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @PostMapping(path = "/{id}/attachments/{attachmentId}", consumes = { "multipart/form-data" })
+    @GetMapping(path = "/{id}/attachments/{attachmentId}")
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Add attachments to tasks")
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
     public ResponseEntity<byte[]> addAttachment(@PathVariable Long boardId, @PathVariable Long id,
@@ -99,7 +100,7 @@ public class TaskController {
         HttpHeaders headers = new HttpHeaders();
         StringBuilder builder = new StringBuilder();
         builder.append("attachment; ").append("filename=").append(a.getName());
-        headers.add("Content-Type", a.getContentType());
+        headers.add("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
         headers.add("Content-Disposition", builder.toString());
         return new ResponseEntity<byte[]>(a.getData(), headers, HttpStatus.OK);
     }
