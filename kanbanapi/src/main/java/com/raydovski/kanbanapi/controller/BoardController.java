@@ -54,7 +54,7 @@ public class BoardController {
     @PostMapping
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Create board")
     public ResponseEntity<BoardDto> get(@RequestBody @Valid BoardDto boardDto,
-            @ApiIgnore Authentication authentication) {
+                                        @ApiIgnore Authentication authentication) {
         User loggedInUser = this.userService.getUserFromAuthentication(authentication);
         boardDto.getOwners().add(this.userService.convertToDto(loggedInUser));
         return ResponseEntity.ok(this.boardService.create(boardDto));
@@ -64,7 +64,7 @@ public class BoardController {
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Edit board")
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #id) or @boardService.isMember(#authentication.getName(), #id)")
     public ResponseEntity<BoardDto> edit(@PathVariable Long id, @RequestBody @Valid BoardDto boardDto,
-            @ApiIgnore Authentication authentication) {
+                                         @ApiIgnore Authentication authentication) {
         User loggedInUser = this.userService.get(authentication.getName());
         boardDto.getOwners().add(this.userService.convertToDto(loggedInUser));
         return ResponseEntity.ok(this.boardService.edit(id, boardDto));
@@ -73,8 +73,8 @@ public class BoardController {
     @DeleteMapping("/{id}")
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Delete board")
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #id) or @boardService.isMember(#authentication.getName(), #id)")
-    public ResponseEntity<?> delete(@PathVariable Long id, @RequestBody @Valid BoardDto boardDto,
-            @ApiIgnore Authentication authentication) {
+    public ResponseEntity<?> delete(@PathVariable Long id,
+                                    @ApiIgnore Authentication authentication) {
         this.boardService.delete(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
