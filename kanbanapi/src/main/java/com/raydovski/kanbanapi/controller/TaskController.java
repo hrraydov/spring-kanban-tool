@@ -1,12 +1,15 @@
 package com.raydovski.kanbanapi.controller;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.raydovski.kanbanapi.dto.AttachmentDto;
 import com.raydovski.kanbanapi.dto.TaskDto;
 import com.raydovski.kanbanapi.dto.TaskSearchDto;
 import com.raydovski.kanbanapi.entity.Attachment;
@@ -86,21 +89,28 @@ public class TaskController {
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
     public ResponseEntity<?> addAttachment(@PathVariable Long boardId, @PathVariable Long id,
             @ApiIgnore Authentication authentication, @RequestParam MultipartFile file) {
-        System.out.println(file);
-        this.taskService.addAttachments(boardId, id, new HashSet<>(Arrays.asList(file)));
+        this.taskService.addAttachments(boardId, id, Arrays.asList(file).stream().map(f -> {
+            try {
+                return AttachmentDto.builder().contentType(f.getContentType()).data(f.getBytes())
+                        .name(f.getOriginalFilename()).build();
+            } catch (IOException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }).collect(Collectors.toSet()));
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}/attachments/{attachmentId}")
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Add attachments to tasks")
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
-    public ResponseEntity<byte[]> addAttachment(@PathVariable Long boardId, @PathVariable Long id,
+    public ResponseEntity<byte[]> getAttachment(@PathVariable Long boardId, @PathVariable Long id,
             @ApiIgnore Authentication authentication, @PathVariable String attachmentId) {
-        Attachment a = this.taskService.getAttachment(boardId, id, attachmentId);
+        AttachmentDto a = this.taskService.getAttachment(boardId, id, attachmentId);
         HttpHeaders headers = new HttpHeaders();
         StringBuilder builder = new StringBuilder();
         builder.append("attachment; ").append("filename=").append(a.getName());
-        headers.add("Content-Type", MediaType.APPLICATION_OCTET_STREAM_VALUE);
+        headers.add("Content-Type", a.getContentType());
         headers.add("Content-Disposition", builder.toString());
         return new ResponseEntity<byte[]>(a.getData(), headers, HttpStatus.OK);
     }

@@ -22,6 +22,7 @@ import com.raydovski.kanbanapi.dto.TaskDto;
 import com.raydovski.kanbanapi.dto.TaskSearchDto;
 import com.raydovski.kanbanapi.entity.Attachment;
 import com.raydovski.kanbanapi.entity.Task;
+import com.raydovski.kanbanapi.repository.AttachmentRepository;
 import com.raydovski.kanbanapi.repository.PhaseRepository;
 import com.raydovski.kanbanapi.repository.TaskRepository;
 
@@ -46,6 +47,9 @@ public class TaskService {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private AttachmentRepository attachmentRepository;
 
     public TaskDto create(Long boardId, TaskDto dto) {
         Task task = new Task();
@@ -88,31 +92,29 @@ public class TaskService {
         return this.convertToDto(task);
     }
 
-    public void addAttachments(Long boardId, Long taskId, Set<MultipartFile> files) {
+    public void addAttachments(Long boardId, Long taskId, Set<AttachmentDto> files) {
         Task task = this.getEntity(taskId);
         if (!task.getBoard().getId().equals(boardId)) {
             throw new EntityNotFoundException();
         }
         task.getAttachments().addAll(files.stream().map(file -> {
-            try {
-                return Attachment.builder().contentType(file.getContentType()).data(file.getBytes())
-                        .id(UUID.randomUUID().toString()).name(file.getOriginalFilename()).build();
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
-            }
+            return Attachment.builder().contentType(file.getContentType()).data(file.getData())
+                    .id(UUID.randomUUID().toString()).name(file.getName()).task(task).build();
         }).collect(Collectors.toSet()));
         this.taskRepository.save(task);
-        System.err.println(task.getAttachments());
     }
 
-    public Attachment getAttachment(Long boardId, Long taskId, String id) {
+    public AttachmentDto getAttachment(Long boardId, Long taskId, String id) {
         Task task = this.getEntity(taskId);
         if (!task.getBoard().getId().equals(boardId)) {
             throw new EntityNotFoundException();
         }
-        return task.getAttachments().stream().filter(x -> x.getId().equals(id)).findFirst()
-                .orElseThrow(() -> new EntityNotFoundException());
+        Attachment att = this.attachmentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        if (!att.getTask().getId().equals(taskId)) {
+            throw new EntityNotFoundException();
+        }
+        return AttachmentDto.builder().id(att.getId()).name(att.getName()).contentType(att.getContentType())
+                .data(att.getData()).build();
     }
 
     public Task getEntity(Long id) {
@@ -131,8 +133,11 @@ public class TaskService {
         BeanUtils.copyProperties(task, taskDto, "assignedTo", "phase", "attachments");
         taskDto.setPhase(PhaseDto.builder().id(task.getPhase().getId()).name(task.getPhase().getName()).build());
         taskDto.setAssignedTo(this.userService.convertToDto(task.getAssignedTo()));
-        taskDto.setAttachments(task.getAttachments().stream()
-                .map(att -> AttachmentDto.builder().id(att.getId()).build()).collect(Collectors.toSet()));
+        taskDto.setAttachments(
+                task.getAttachments().stream()
+                        .map(att -> AttachmentDto.builder().id(att.getId()).name(att.getName())
+                                .contentType(att.getContentType()).data(att.getData()).build())
+                        .collect(Collectors.toSet()));
         return taskDto;
     }
 
