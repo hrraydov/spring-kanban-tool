@@ -2,17 +2,24 @@ package com.raydovski.kanbanapi.controller;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raydovski.kanbanapi.dto.AttachmentDto;
 import com.raydovski.kanbanapi.dto.TaskDto;
+import com.raydovski.kanbanapi.dto.TaskHistoryDto;
 import com.raydovski.kanbanapi.dto.TaskSearchDto;
+import com.raydovski.kanbanapi.dto.UserDto;
 import com.raydovski.kanbanapi.entity.Attachment;
+import com.raydovski.kanbanapi.entity.TaskHistoryType;
 import com.raydovski.kanbanapi.service.BoardService;
 import com.raydovski.kanbanapi.service.TaskService;
 import com.raydovski.kanbanapi.service.UserService;
@@ -116,11 +123,60 @@ public class TaskController {
     }
 
     @DeleteMapping("/{id}")
-    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get task for board")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Delete task")
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
     public ResponseEntity<?> delete(@PathVariable Long boardId, @PathVariable Long id,
             @ApiIgnore Authentication authentication) {
         this.taskService.delete(boardId, id);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}/history")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get history for task")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
+    public List<TaskHistoryDto> getHistory(@PathVariable Long boardId, @PathVariable Long id,
+            @ApiIgnore Authentication authentication, @RequestParam(required = true) TaskHistoryType type) {
+        return this.taskService.getHistory(boardId, id, type);
+    }
+
+    @GetMapping("/{id}/history/stats")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get history for task")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
+    public Object getHistoryStats(@PathVariable Long boardId, @PathVariable Long id,
+            @ApiIgnore Authentication authentication, @RequestParam(required = true) TaskHistoryType type)
+            throws JsonProcessingException {
+        List<TaskHistoryDto> history = this.taskService.getHistory(boardId, id, type);
+        switch (type) {
+        case TIME_LOGGED: {
+            return history.stream().mapToLong(x -> Long.valueOf(x.getData().toString())).sum();
+        }
+        case ASSIGNED_TO_CHANGED: {
+            Map<String, Long> result = new HashMap<>();
+            ObjectMapper mapper = new ObjectMapper();
+            for (TaskHistoryDto h : history) {
+                result.putIfAbsent(mapper.writeValueAsString(h.getData()), 0L);
+                result.compute(mapper.writeValueAsString(h.getData()), (k, v) -> v + 1);
+            }
+            return result;
+        }
+        case PHASE_CHANGED: {
+            Map<String, Long> result = new HashMap<>();
+            ObjectMapper mapper = new ObjectMapper();
+            for (TaskHistoryDto h : history) {
+                result.putIfAbsent(mapper.writeValueAsString(h.getData()), 0L);
+                result.compute(mapper.writeValueAsString(h.getData()), (k, v) -> v + 1);
+            }
+            return result;
+        }
+        }
+        return null;
+    }
+
+    @PostMapping("/{id}/logTime")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Get history for task")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
+    public void logTime(@PathVariable Long boardId, @PathVariable Long id, @ApiIgnore Authentication authentication,
+            @RequestBody Long logTime) {
+        this.taskService.logTime(boardId, id, logTime);
     }
 }

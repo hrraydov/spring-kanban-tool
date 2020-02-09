@@ -1,16 +1,17 @@
 package com.raydovski.kanbanapi.entity;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -46,5 +47,10 @@ public class Task {
 
     @ManyToOne
     private BoardPhase phase;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OrderBy(value = "date ASC")
+    private List<TaskHistory> history = new ArrayList<>();
 
 }
