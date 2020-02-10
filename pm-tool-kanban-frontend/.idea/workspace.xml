@@ -2,9 +2,12 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f195df81-2f0c-404a-8de6-5f0759970810" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/services/board-service.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/services/board-service.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/App.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/App.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/boards/BoardDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/boards/BoardDetails.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/tasks/TaskDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/tasks/TaskDetails.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/tasks/TaskForm.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/tasks/TaskForm.js" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -58,7 +61,7 @@
       <workItem from="1580719125785" duration="1000" />
       <workItem from="1580719144101" duration="85178000" />
       <workItem from="1581012660269" duration="42355000" />
-      <workItem from="1581333201329" duration="3776000" />
+      <workItem from="1581333201329" duration="13247000" />
     </task>
     <servers />
   </component>

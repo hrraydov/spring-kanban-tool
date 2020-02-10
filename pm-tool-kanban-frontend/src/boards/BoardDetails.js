@@ -80,6 +80,10 @@ const BoardDetails = (props) => {
         setOpenModal(true);
     };
 
+    const handleTaskDetails = (taskId) => {
+        props.history.push(`/boards/${boardId}/tasks/${taskId}/details`);
+    };
+
     const handleSubmitTask = (data) => {
         modalEditOpen ?
             editTask(board.id, task.id, data)
@@ -197,7 +201,7 @@ const BoardDetails = (props) => {
                                                         >
                                                             <Card className="shadow-none" key={task.id}>
                                                                 <Row>
-                                                                    <Col md={9}>
+                                                                    <Col md={9} onClick={() => handleTaskDetails(task.id)}>
                                                                     <span
                                                                         className="font-weight-bold ml-1 mt-1">{task.name}</span>
                                                                     </Col>
@@ -215,7 +219,7 @@ const BoardDetails = (props) => {
                                                                     </Col>
                                                                 </Row>
                                                                 <Row>
-                                                                    <Col md={12}>
+                                                                    <Col md={12} onClick={() => handleTaskDetails(task.id)}>
                                                                         <small className="ml-1">
                                                                             <span className="mr-1">Assigned to:</span>
                                                                             <i>{task.assignedTo.email}</i>
@@ -223,7 +227,7 @@ const BoardDetails = (props) => {
                                                                     </Col>
                                                                 </Row>
                                                                 <Row>
-                                                                    <Col md={12} className="ml-1 mb-1">
+                                                                    <Col md={12} className="ml-1 mb-1" onClick={() => handleTaskDetails(task.id)}>
                                                                         <small>
                                                                             <span className="mr-1">
                                                                                 Description:

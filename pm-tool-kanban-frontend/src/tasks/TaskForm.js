@@ -3,7 +3,8 @@ import {Col, Form, FormGroup, Label, Input, Button, FormFeedback} from 'reactstr
 import {useDropzone} from 'react-dropzone';
 import Select from "react-select";
 import * as Yup from 'yup';
-import {Formik, ErrorMessage} from 'formik';
+import {Formik} from 'formik';
+import RichTextEditor from 'react-rte';
 
 const validationSchema = (values) => {
     return Yup.object().shape({
@@ -41,15 +42,11 @@ const getErrorsFromValidationError = (validationError) => {
 const TaskForm = (props) => {
     const initialValues = {
         name: props.data.name ? props.data.name : '',
-        description: props.data.description ? props.data.description : '',
         assignedTo: props.data.assignedTo ? props.data.assignedTo : {},
         phase: props.data.phase ? props.data.phase : {},
     };
-    // const [name, setName] = useState(props.data.name ? props.data.name : '');
-    // const [description, setDescription] = useState(props.data.description ? props.data.description : '');
-    // const [assignedTo, setAssignedTo] = useState(props.data.assignedTo ? props.data.assignedTo : {});
     const [attachments, setAttachments] = useState(props.data.attachments ? props.data.attachments : []);
-    // const [phase, setPhase] = useState(props.data.phase ? props.data.phase : {});*/
+    const [description, setDescription] = useState(props.data.description ? RichTextEditor.createValueFromString(props.data.description, 'markdown') : RichTextEditor.createValueFromString('', 'markdown'));
 
     const formatOptionLabel = ({value, label, type}) => (
         <div className="d-flex">
@@ -118,48 +115,19 @@ const TaskForm = (props) => {
         setAttachments(Object.assign([], attachments));
     }, [acceptedFiles]);
 
-    // const files = acceptedFiles.map(file => {
-    //     const reader = new FileReader();
-    //     reader.readAsDataURL(file);
-    //     reader.onload = () => {
-    //         const obj = {
-    //             file: file,
-    //             url: reader.result
-    //         };
-    //         console.log(reader.readyState);
-    //         //attachments.push(obj);
-    //         //setAttachments(attachments);
-    //     };
-    //     reader.onerror = (error) => {
-    //         console.error(error);
-    //     };
-    //     return (
-    //         <li key={file.path}>
-    //             <a href={"#"} target="_blank">{file.path}</a>
-    //             <span className="mx-1">({file.size} bytes)</span>
-    //             <span onClick={() => {
-    //                 files.splice(files.indexOf(file), 1);
-    //             }}><i className="fas fa-times"/>
-    //             </span>
-    //         </li>
-    //     );
-    // });
-
     const handleSubmit = (values) => {
-        //e.preventDefault();
-        //e.stopPropagation();
 
         const data = {
             id: props.type === 'edit' ? props.data.id : '',
             assignedTo: values.assignedTo,
             name: values.name,
-            description: values.description,
+            description: description.toString('markdown'),
             phase: props.type === 'edit' ? values.phase : {
                 id: props.board.phases[0].id
             },
             attachments: attachments
         };
-
+        console.log(data);
         props.onSubmit(data);
     };
 
@@ -299,16 +267,21 @@ const TaskForm = (props) => {
                                 </div>
                             </Col>
                         </FormGroup>
+
                         <FormGroup row>
                             <Label htmlFor="description" md={2}>Description</Label>
                             <Col md={10}>
-                                <Input type="textarea" name="description" id="description" value={values.description}
-                                       onChange={handleChange}/>
+                                <RichTextEditor
+                                    name="description"
+                                    id="description"
+                                    value={description}
+                                    onChange={(value) => {
+                                        setDescription(value);
+                                    }}
+                                />
                             </Col>
                         </FormGroup>
-                        <Button type="submit" disabled={isSubmitting} onClick={() => {
-                            validateForm(errors);
-                        }} color="primary">Save</Button>
+                        <Button type="submit" disabled={isSubmitting} color="primary">Save</Button>
                     </Form>
                 )}
         />

@@ -12,6 +12,7 @@ import UserDetails from "./users/UserDetails";
 import {BrowserRouter, Switch, Route, Redirect} from 'react-router-dom';
 import {userInfo} from './services/board-service';
 import jwt from 'jsonwebtoken';
+import TaskDetails from "./tasks/TaskDetails";
 
 const App = () => {
 
@@ -38,6 +39,7 @@ const App = () => {
                             <Route path="/dashboard" exact component={Dashboard}/>
                             <Route path="/boards" exact component={Boards}/>
                             <Route path="/boards/:boardId/details" exact component={BoardDetails}/>
+                            <Route path="/boards/:boardId/tasks/:taskId/details" exact component={TaskDetails} />
                             <Route path="/users/:userId" exact component={UserDetails} />
                             <Redirect to="/dashboard"/>
                         </Switch>
