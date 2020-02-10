@@ -243,3 +243,25 @@ export const getUser = async (email) => {
     const json = await result.json();
     return json;
 };
+
+export const getTaskHistory = async (boardId, taskId, type) => {
+    const result = await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/history?type=${type}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+        },
+    });
+    const json = await result.json();
+    return json;
+};
+
+export const getTaskStatistic = async (boardId, taskId, type) => {
+    const result = await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/history/stats?type=${type}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+        },
+    });
+    const json = await result.json();
+    return json;
+};

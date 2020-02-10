@@ -219,10 +219,10 @@ const BoardDetails = (props) => {
                                                                     </Col>
                                                                 </Row>
                                                                 <Row>
-                                                                    <Col md={12} onClick={() => handleTaskDetails(task.id)}>
-                                                                        <small className="ml-1">
+                                                                    <Col md={12} className="ml-1 mb-1" onClick={() => handleTaskDetails(task.id)}>
+                                                                        <small>
                                                                             <span className="mr-1">Assigned to:</span>
-                                                                            <i>{task.assignedTo.email}</i>
+                                                                            <span className="text-wrap">{task.assignedTo.email}</span>
                                                                         </small>
                                                                     </Col>
                                                                 </Row>
@@ -230,10 +230,10 @@ const BoardDetails = (props) => {
                                                                     <Col md={12} className="ml-1 mb-1" onClick={() => handleTaskDetails(task.id)}>
                                                                         <small>
                                                                             <span className="mr-1">
-                                                                                Description:
+                                                                                Logged time:
                                                                             </span>
                                                                             <span className="text-wrap">
-                                                                                {task.description === '' ? 'No description' : task.description}
+                                                                                {task.description === '' ? 'No logged time' : 'No logged time'}
                                                                             </span>
                                                                         </small>
                                                                     </Col>

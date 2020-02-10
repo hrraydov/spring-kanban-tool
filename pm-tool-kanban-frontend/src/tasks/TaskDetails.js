@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
-import {Container, Row, Col} from 'reactstrap';
-import {getBoard, getTask} from '../services/board-service';
+import {Container, Row, Col, Card, CardImg, CardBody, CardText, Input, Label, Table} from 'reactstrap';
+import {getBoard, getTask, getTaskHistory, getTaskStatistic} from '../services/board-service';
 import ReactMarkdown from 'react-markdown';
 
 const TaskDetails = (props) => {
@@ -8,6 +8,9 @@ const TaskDetails = (props) => {
     const [task, setTask] = useState({});
     const [shouldFetch, setShouldFetch] = useState(true);
     const [loading, setLoading] = useState(true);
+    const [history, setHistory] = useState([]);
+    const [statistic, setStatistic] = useState({});
+    const [type, setType] = useState('TIME_LOGGED');
     const {boardId} = props.match.params;
     const {taskId} = props.match.params;
 
@@ -15,10 +18,14 @@ const TaskDetails = (props) => {
         const func = async () => {
             const board = await getBoard(+boardId);
             const task = await getTask(+boardId, +taskId);
+            const history = await getTaskHistory(+boardId, +taskId, type);
+            const statistic = await getTaskStatistic(+boardId, +taskId, type);
 
             setLoading(false);
             setBoard(board);
             setTask(task);
+            setHistory(history);
+            setStatistic(statistic === 0 ? {} : statistic);
         };
         if (shouldFetch) {
             func();
@@ -57,18 +64,137 @@ const TaskDetails = (props) => {
                     <div className="d-flex flex-column mb-3">
                         <div className="mb-2 font-italic">Description:</div>
                         <div className="pl-1">
-                            <ReactMarkdown source={task.description}/>
+                            {
+                                task.description === '' ?
+                                'No description' :
+                                <ReactMarkdown source={task.description}/>
+                            }
                         </div>
                     </div>
                     <div className="d-flex flex-column">
                         <div className="mb-2 font-italic">Attachments:</div>
-                        <div>
-                            
+                        <div className="p-1">
+                            {task.attachments?.length !== 0 ? task.attachments?.map(attachment => (
+                                <Card className="w-75" key={attachment.id}>
+                                    <a href={URL.createObjectURL(attachment.blob)} target="_blank">
+                                        {
+                                            attachment.contentType.includes('image') ? (
+                                                <CardImg top
+                                                         width="50%"
+                                                         src={URL.createObjectURL(attachment.blob)}
+                                                         alt=""
+                                                />
+                                            ) : ''
+                                        }
+                                    </a>
+                                    <CardBody>
+                                        <CardText className="d-flex align-items-center">
+                                            {
+                                                attachment.contentType.includes('image') ?
+                                                    <React.Fragment>
+                                                        <i className="far fa-file-image fa-2x mr-2"/>
+                                                        <span>{attachment.name}</span>
+                                                    </React.Fragment>
+                                                    :
+                                                    <React.Fragment>
+                                                        <i className="far fa-file-alt fa-2x mr-2"/>
+                                                        <a href={URL.createObjectURL(attachment.blob)}
+                                                           target="_blank">{attachment.name}</a>
+                                                    </React.Fragment>
+                                            }
+                                        </CardText>
+                                    </CardBody>
+                                </Card>
+                            )) :
+                                'No attachments'
+                            }
                         </div>
                     </div>
                 </Col>
                 <Col md="6">
-
+                    <div className="d-flex flex-row justify-content-around pl-2">
+                        <Label check>
+                            <Input type="radio" name="loggedTime" checked={type === 'TIME_LOGGED'} onChange={() => {
+                                setType('TIME_LOGGED')
+                                setShouldFetch(true);
+                            }}/>{' '}
+                            Logged time
+                        </Label>
+                        <Label check>
+                            <Input type="radio" name="phaseChanged" checked={type === 'PHASE_CHANGED'} onChange={() => {
+                                setType('PHASE_CHANGED')
+                                setShouldFetch(true);
+                            }}/>{' '}
+                            Phase changed
+                        </Label>
+                        <Label check>
+                            <Input type="radio" name="assignedToChange" checked={type === 'ASSIGNED_TO_CHANGED'}
+                                   onChange={() => {
+                                       setType('ASSIGNED_TO_CHANGED')
+                                       setShouldFetch(true);
+                                   }}/>{' '}
+                            Assigned to changed
+                        </Label>
+                    </div>
+                    <hr/>
+                    <h5 className="bg-primary text-white p-1 rounded shadow-sm">History</h5>
+                    {history.length !== 0 ? (
+                        <div className="h-50 overflow-auto">
+                            <Table striped>
+                                <thead>
+                                <tr>
+                                    {
+                                        type === 'TIME_LOGGED' ? (<th>Time</th>) : type === 'PHASE_CHANGED' ? (
+                                            <th>Phase</th>) : (<th>User</th>)
+                                    }
+                                    <th>Time</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {history?.map(item => (
+                                    <tr key={item.date}>
+                                        {type === 'TIME_LOGGED' ? (<td>Time</td>) : type === 'PHASE_CHANGED' ? (
+                                            <td>{item.data.name}</td>) : (<td>{item.data.email}</td>)}
+                                        <td>{new Date(item.date).toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                                </tbody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div className="text-center">There is no history found for that type.</div>
+                    )}
+                    <hr/>
+                    <h5 className="bg-primary text-white p-1 rounded shadow-sm">Statistic</h5>
+                    {Object.entries(statistic).length !== 0 ? (
+                        <div className="h-50 overflow-auto">
+                            <Table striped>
+                                <thead>
+                                <tr>
+                                    {
+                                        type === 'TIME_LOGGED' ? (<th>Time</th>) : type === 'PHASE_CHANGED' ? (
+                                            <th>Phase</th>) : (<th>User</th>)
+                                    }
+                                    <th>Changes count</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {
+                                    Object.entries(statistic).map(entry => (
+                                        <tr key={entry}>
+                                            {type === 'TIME_LOGGED' ? (<td>Time</td>) : type === 'PHASE_CHANGED' ? (
+                                                <td>{JSON.parse(entry[0]).name}</td>) : (
+                                                <td>{JSON.parse(entry[0]).email}</td>)}
+                                            <td>{entry[1]}</td>
+                                        </tr>
+                                    ))
+                                }
+                                </tbody>
+                            </Table>
+                        </div>
+                    ) : (
+                        <div className="text-center">There is no statistic found for that type.</div>
+                    )}
                 </Col>
             </Row>
         </Container>

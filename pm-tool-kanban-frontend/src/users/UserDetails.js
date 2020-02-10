@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Container, Row, Col, Card, CardImg, CardBody, Modal, ModalHeader, ModalBody} from 'reactstrap';
 import {userInfo} from "../services/board-service";
 import UserDetailsForm from "./UserDetailsForm";
+import useUser from "../hooks/useUser";
 
 const UserDetails = (props) => {
 
@@ -10,6 +11,8 @@ const UserDetails = (props) => {
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
     const {userId} = props.match.params;
+
+    const userDetails = useUser();
 
     useEffect(() => {
         const func = async () => {
@@ -41,7 +44,9 @@ const UserDetails = (props) => {
                     setOpenModal(!openModal);
                 }}>{'Edit user profile'}</ModalHeader>
                 <ModalBody>
-                    <UserDetailsForm data={user} onSubmit={(data) => {handleSubmit(data)}} />
+                    <UserDetailsForm data={user} onSubmit={(data) => {
+                        handleSubmit(data)
+                    }}/>
                 </ModalBody>
             </Modal>
         );
@@ -54,7 +59,9 @@ const UserDetails = (props) => {
                 <Col md="12">
                     <div><h2> User profile</h2></div>
                     <Card className="d-flex flex-row">
-                        <CardImg className="w-25 h-25 m-2" src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/512/user-male-icon.png" alt="Card image cap" />
+                        <CardImg className="w-25 h-25 m-2"
+                                 src="https://icons.iconarchive.com/icons/paomedia/small-n-flat/512/user-male-icon.png"
+                                 alt="Card image cap"/>
                         <CardBody>
                             <Row>
                                 <Col md="2" className="font-weight-bold d-flex flex-column">
@@ -68,11 +75,13 @@ const UserDetails = (props) => {
                                     <span>{user.lastName ? user.lastName : ' - '}</span>
                                 </Col>
                                 <Col md="2" className="d-flex justify-content-end">
-                                    <span onClick={() => {
-                                        setOpenModal(true);
-                                    }}>
-                                        <i className="fas fa-edit fa-2x" />
-                                    </span>
+                                    {user.id === userDetails.id ?
+                                        <span onClick={() => {
+                                            setOpenModal(true);
+                                        }}>
+                                            <i className="fas fa-edit fa-2x"/>
+                                        </span> : ''
+                                    }
                                 </Col>
                             </Row>
                         </CardBody>
