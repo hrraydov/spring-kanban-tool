@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {Container, Row, Col, Table, Modal, ModalHeader, ModalBody, Button} from 'reactstrap';
-import {getBoards, deleteBoard, editBoard, createBoard, getBoard} from '../services/board-service';
+import {getBoards, deleteBoard, editBoard, createBoard, getBoard, getUser} from '../services/board-service';
 import useUser from '../hooks/useUser';
 import BoardForm from "./BoardForm";
 
@@ -29,11 +29,12 @@ const Boards = (props) => {
     }, [shouldLoad]);
 
     const handleDelete = (boardId) => {
-        deleteBoard(boardId).then(() => {
-            setShouldLoad(true);
-        }).catch(err => {
-            console.error(err);
-        });
+        deleteBoard(boardId)
+            .then(() => {
+                setShouldLoad(true);
+            }).catch(err => {
+                console.error(err);
+            });
     };
 
     const handleSubmitBoard = (data) => {
@@ -72,12 +73,29 @@ const Boards = (props) => {
         });
     };
 
-    const handleDetails = (board_id) => {
-        props.history.push(`/boards/${board_id}/details`);
+    const fetchUsers = (selectInput) => {
+        return new Promise(resolve => {
+            if (selectInput.length >= 3) {
+                getUser(selectInput)
+                    .then(res => {
+                        resolve(res.map(user => ({value: user.id, label: user.email})));
+                    })
+                    .catch(err => {
+                        console.error(err);
+                    });
+            } else {
+                setTimeout(() => { resolve([]); }, 10);
+            }
+        });
+
     };
 
-    const isOwner = (board_id) => {
-        return boards.find(board => board.id === board_id).owners.map(owner => owner.id).includes(userDetails.id);
+    const handleDetails = (boardId) => {
+        props.history.push(`/boards/${boardId}/details`);
+    };
+
+    const isOwner = (boardId) => {
+        return boards.find(board => board.id === boardId).owners.map(owner => owner.id).includes(userDetails.id);
     };
 
     const renderBoardModal = () => {
@@ -91,7 +109,7 @@ const Boards = (props) => {
                     setBoard({});
                 }}>{modalEditOpen ? 'Edit board' : 'Add board'}</ModalHeader>
                 <ModalBody>
-                    <BoardForm data={board} fetchUsers={[]} type={modalEditOpen ? 'edit' : 'create'}
+                    <BoardForm data={board} loadOptions={fetchUsers} type={modalEditOpen ? 'edit' : 'create'}
                                onSubmit={(data) => {
                                    handleSubmitBoard(data)
                                }}/>
@@ -105,7 +123,7 @@ const Boards = (props) => {
             <Row>
                 {openModal && renderBoardModal()}
                 <Col md="12">
-                    <Table striped>
+                    <Table striped hover>
                         <thead>
                         <tr>
                             <th>#</th>
@@ -118,26 +136,29 @@ const Boards = (props) => {
                         {
                             boards ? boards.map(item => (
                                     <tr key={item.id}>
-                                        <th scope="row">{item.id}</th>
-                                        <td>{item.name}</td>
-                                        <td>{isOwner(item.id) ? 'Owner' : 'Member'}</td>
+                                        <th scope="row" onClick={() => {
+                                            handleDetails(item.id);
+                                        }}>{item.id}</th>
+                                        <td onClick={() => {
+                                            handleDetails(item.id);
+                                        }}>{item.name}</td>
+                                        <td onClick={() => {
+                                            handleDetails(item.id);
+                                        }}>{isOwner(item.id) ? 'Owner' : 'Member'}</td>
                                         <td className="text-center">
-                                            <i className="fas fa-info-circle mr-2" onClick={() => {
-                                                handleDetails(item.id);
-                                            }}/>
                                             {
                                                 isOwner(item.id) && (
                                                     <React.Fragment>
-                                                        <span onClick={() => {
+                                                        <a href="javascript:;" onClick={() => {
                                                             handleEdit(item.id)
                                                         }}>
                                                             <i className="far fa-edit mr-2 text-info"/>
-                                                        </span>
-                                                        <span onClick={() => {
+                                                        </a>
+                                                        <a href="javascript:;" onClick={() => {
                                                             handleDelete(item.id)
                                                         }}>
                                                             <i className="far fa-trash-alt text-danger"/>
-                                                        </span>
+                                                        </a>
                                                     </React.Fragment>
                                                 )
                                             }

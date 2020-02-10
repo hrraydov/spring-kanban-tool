@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Container, Row, Col, Card, CardImg, CardBody, Button, Modal, ModalHeader, ModalBody} from 'reactstrap';
+import {Container, Row, Col, Card, CardImg, CardBody, Modal, ModalHeader, ModalBody} from 'reactstrap';
 import {userInfo} from "../services/board-service";
 import UserDetailsForm from "./UserDetailsForm";
 
@@ -41,7 +41,7 @@ const UserDetails = (props) => {
                     setOpenModal(!openModal);
                 }}>{'Edit user profile'}</ModalHeader>
                 <ModalBody>
-                    <UserDetailsForm data={user} onSubmit={(data) => {handleSubmit(data)}}/>
+                    <UserDetailsForm data={user} onSubmit={(data) => {handleSubmit(data)}} />
                 </ModalBody>
             </Modal>
         );

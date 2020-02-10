@@ -105,6 +105,8 @@ public class BoardService {
             } else {
                 phase = new BoardPhase();
             }
+            phase.setNextPhase(null);
+            phase.setPrevPhase(null);
             newPhases.add(phase);
             phase.setName(phaseDto.getName());
             phase.setBoard(board);

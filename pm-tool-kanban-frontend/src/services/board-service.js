@@ -82,12 +82,14 @@ export const getTask = async (boardId, taskId) => {
         }
     });
     const json = await result.json();
+    console.log(json);
     const queries = [];
     json.attachments.forEach(attachment => {
         queries.push(getAttachments(boardId, taskId, attachment.id));
     });
-    json.attachments = await Promise.all(queries);
-    console.log(json);
+    const files = await Promise.all(queries);
+    console.log(files);
+    console.log(URL.createObjectURL(files[0]));
     return json;
 };
 
@@ -187,6 +189,17 @@ export const register = async (data) => {
 
 export const userInfo = async () => {
     const result = await fetch(baseUrl + `/auth/info`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+        },
+    });
+    const json = await result.json();
+    return json;
+};
+
+export const getUser = async (email) => {
+    const result = await fetch(baseUrl + `/users?email=${email}`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
