@@ -1,6 +1,6 @@
-import React, {useState, useEffect} from "react";
-import {Container, Row, Col, Table, Modal, ModalHeader, ModalBody, Button} from 'reactstrap';
-import {getBoards, deleteBoard, editBoard, createBoard, getBoard, getUser} from '../services/board-service';
+import React, { useState, useEffect } from "react";
+import { Container, Row, Col, Table, Modal, ModalHeader, ModalBody, Button } from 'reactstrap';
+import { getBoards, deleteBoard, editBoard, createBoard, getBoard, getUser } from '../services/board-service';
 import useUser from '../hooks/useUser';
 import BoardForm from "./BoardForm";
 
@@ -19,6 +19,7 @@ const Boards = (props) => {
             setLoading(false);
             setBoards(boards);
         };
+        console.log(shouldLoad);
         if (shouldLoad) {
             func();
             setShouldLoad(false);
@@ -37,7 +38,7 @@ const Boards = (props) => {
             });
     };
 
-    const handleSubmitBoard = (data) => {
+    const handleSubmitBoard = (data, meta) => {
         modalEditOpen ?
             editBoard(board.id, data)
                 .then(res => {
@@ -45,16 +46,16 @@ const Boards = (props) => {
                     setShouldLoad(true);
                     setBoard({});
                 }).catch(err => {
-                console.error(err);
-            })
+                    console.error(err);
+                })
             :
             createBoard(data)
                 .then(res => {
                     setOpenModal(false);
                     setShouldLoad(true);
                 }).catch(err => {
-                console.error(err);
-            });
+                    console.error(err);
+                });
     };
 
     const handleAddBoard = () => {
@@ -69,8 +70,8 @@ const Boards = (props) => {
                 setBoard(res);
                 setOpenModal(true);
             }).catch(err => {
-            console.error(err);
-        });
+                console.error(err);
+            });
     };
 
     const fetchUsers = (selectInput) => {
@@ -78,7 +79,7 @@ const Boards = (props) => {
             if (selectInput.length >= 3) {
                 getUser(selectInput)
                     .then(res => {
-                        resolve(res.map(user => ({value: user.id, label: user.email})));
+                        resolve(res.map(user => ({ value: user.id, label: user.email })));
                     })
                     .catch(err => {
                         console.error(err);
@@ -110,9 +111,9 @@ const Boards = (props) => {
                 }}>{modalEditOpen ? 'Edit board' : 'Add board'}</ModalHeader>
                 <ModalBody>
                     <BoardForm data={board} loadOptions={fetchUsers} type={modalEditOpen ? 'edit' : 'create'}
-                               onSubmit={(data) => {
-                                   handleSubmitBoard(data)
-                               }}/>
+                        onSubmit={(data) => {
+                            handleSubmitBoard(data)
+                        }} />
                 </ModalBody>
             </Modal>
         );
@@ -125,16 +126,16 @@ const Boards = (props) => {
                 <Col md="12">
                     <Table striped hover>
                         <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Name</th>
-                            <th>Your role</th>
-                            <th className="text-center">Action</th>
-                        </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Name</th>
+                                <th>Your role</th>
+                                <th className="text-center">Action</th>
+                            </tr>
                         </thead>
                         <tbody>
-                        {
-                            boards ? boards.map(item => (
+                            {
+                                boards ? boards.map(item => (
                                     <tr key={item.id}>
                                         <th scope="row" onClick={() => {
                                             handleDetails(item.id);
@@ -152,12 +153,12 @@ const Boards = (props) => {
                                                         <a href="javascript:;" onClick={() => {
                                                             handleEdit(item.id)
                                                         }}>
-                                                            <i className="far fa-edit mr-2 text-info"/>
+                                                            <i className="far fa-edit mr-2 text-info" />
                                                         </a>
                                                         <a href="javascript:;" onClick={() => {
                                                             handleDelete(item.id)
                                                         }}>
-                                                            <i className="far fa-trash-alt text-danger"/>
+                                                            <i className="far fa-trash-alt text-danger" />
                                                         </a>
                                                     </React.Fragment>
                                                 )
@@ -165,12 +166,12 @@ const Boards = (props) => {
                                         </td>
                                     </tr>
                                 )) :
-                                (
-                                    <tr>
-                                        <td colSpan="4">No data found!</td>
-                                    </tr>
-                                )
-                        }
+                                    (
+                                        <tr>
+                                            <td colSpan="4">No data found!</td>
+                                        </tr>
+                                    )
+                            }
                         </tbody>
                     </Table>
                     {
