@@ -62,7 +62,7 @@ public class BoardController {
 
     @PutMapping("/{id}")
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Edit board")
-    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #id) or @boardService.isMember(#authentication.getName(), #id)")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #id)")
     public ResponseEntity<BoardDto> edit(@PathVariable Long id, @RequestBody @Valid BoardDto boardDto,
                                          @ApiIgnore Authentication authentication) {
         User loggedInUser = this.userService.get(authentication.getName());
@@ -72,7 +72,7 @@ public class BoardController {
 
     @DeleteMapping("/{id}")
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Delete board")
-    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #id) or @boardService.isMember(#authentication.getName(), #id)")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #id)")
     public ResponseEntity<?> delete(@PathVariable Long id,
                                     @ApiIgnore Authentication authentication) {
         this.boardService.delete(id);

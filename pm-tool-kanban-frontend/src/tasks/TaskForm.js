@@ -306,9 +306,7 @@ const TaskForm = (props) => {
                                        onChange={handleChange}/>
                             </Col>
                         </FormGroup>
-                        <Button type="submit" disabled={isSubmitting} onClick={() => {
-                            validateForm(errors);
-                        }} color="primary">Save</Button>
+                        <Button type="submit" disabled={isSubmitting} color="primary">Save</Button>
                     </Form>
                 )}
         />

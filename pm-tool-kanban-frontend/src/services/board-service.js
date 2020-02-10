@@ -51,15 +51,34 @@ export const editBoard = async (id, data) => {
 };
 
 export const deleteBoard = async (id) => {
-    const result = await fetch(baseUrl + `/boards/${id}`, {
+    await fetch(baseUrl + `/boards/${id}`, {
         method: 'DELETE',
         headers: {
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
         }
     });
-    const json = await result.json();
-    return json;
 };
+
+export const getTasksAssignedToUser = async (userId) => {
+    const boards = await getBoards();
+    const results = [];
+    for (const boardIndex in boards) {
+        const board = boards[boardIndex];
+        const res = await fetch(baseUrl + `/boards/${board.id}/tasks?userId=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        const json = await res.json();
+        results.push(...json.map(task => ({
+            ...task,
+            boardId: board.id
+        })));
+    }
+    return results;
+}
 
 export const getTasks = async (boardId) => {
     const result = await fetch(baseUrl + `/boards/${boardId}/tasks`, {
@@ -88,7 +107,7 @@ export const getTask = async (boardId, taskId) => {
     });
     const attachments = await Promise.all(queries);
     json.attachments.forEach(att => {
-        att['blob'] = attachments.find(x=>x.id === att.id).blob;
+        att['blob'] = attachments.find(x => x.id === att.id).blob;
     });
     return json;
 };
@@ -182,7 +201,7 @@ export const login = async (data) => {
         body: JSON.stringify(data),
     });
     const json = await result.json();
-    if(result.status >= 400) {
+    if (result.status >= 400) {
         throw new Error(json.code);
     }
     return json;
@@ -197,7 +216,7 @@ export const register = async (data) => {
         body: JSON.stringify(data),
     });
     const json = await result.json();
-    if(result.status >= 400) {
+    if (result.status >= 400) {
         throw new Error(json.code);
     }
     return json;

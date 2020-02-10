@@ -57,8 +57,6 @@ const App = () => {
     );
 
     useEffect(() => {
-        const func = async () => {
-        };
         if (!!user) {
             if (jwt.decode(user, {complete: true}).payload.exp * 1000 < Date.now()) {
                 localStorage.removeItem('token');
@@ -66,7 +64,6 @@ const App = () => {
             } else {
                 getUserInfo();
             }
-            func();
         }
     }, [user]);
 

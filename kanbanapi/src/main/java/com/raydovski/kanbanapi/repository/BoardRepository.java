@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, Long> {
 
-    @Query(value = "select distinct b from Board b join fetch b.members as m join fetch b.owners as o where o.id=:id or m.id=:id")
+    @Query(value = "select distinct b from Board b left join fetch b.members as m left join fetch b.owners as o where o.id=:id or m.id=:id")
     List<Board> findMemberOrOwnerOf(@Param(value = "id") Long id);
 
 }

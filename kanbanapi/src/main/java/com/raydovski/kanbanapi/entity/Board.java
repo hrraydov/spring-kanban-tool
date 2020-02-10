@@ -45,7 +45,7 @@ public class Board {
     private Set<BoardPhase> phases = new HashSet<>();
 
     @Builder.Default
-    @OneToMany(mappedBy = "board")
+    @OneToMany(mappedBy = "board", cascade = CascadeType.ALL)
     private Set<Task> tasks = new HashSet<>();
 
 }

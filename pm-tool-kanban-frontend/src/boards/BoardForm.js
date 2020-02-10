@@ -37,7 +37,6 @@ const BoardForm = (props) => {
     const [newPhase, setNewPhase] = useState('');
 
     const handleSubmit = (values) => {
-
         const data = {
             id: props.data.id,
             name: values.name,
@@ -211,7 +210,7 @@ const BoardForm = (props) => {
                                                         <ListGroup className="d-flex flex-column align-items-center">
                                                             {values.phases?.map((phase, index) => {
                                                                 return (
-                                                                    <React.Fragment key={phase.name}>
+                                                                    <React.Fragment key={phase.id + phase.name}>
                                                                         <ListGroupItem className="mr-2 p-3 w-75 rounded"
                                                                             tag="span"
                                                                             draggable
