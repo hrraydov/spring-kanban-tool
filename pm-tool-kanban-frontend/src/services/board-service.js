@@ -82,14 +82,14 @@ export const getTask = async (boardId, taskId) => {
         }
     });
     const json = await result.json();
-    console.log(json);
     const queries = [];
     json.attachments.forEach(attachment => {
         queries.push(getAttachments(boardId, taskId, attachment.id));
     });
-    const files = await Promise.all(queries);
-    console.log(files);
-    console.log(URL.createObjectURL(files[0]));
+    const attachments = await Promise.all(queries);
+    json.attachments.forEach(att => {
+        att['blob'] = attachments.find(x=>x.id === att.id).blob;
+    });
     return json;
 };
 
@@ -105,14 +105,17 @@ export const createTask = async (boardId, data) => {
     const json = await result.json();
     const queries = [];
     data.attachments.forEach(attachment => {
-        queries.push(createAttachment(boardId, json.id, attachment));
+        queries.push(createAttachment(boardId, json.id, attachment.blob));
     });
     await Promise.all(queries);
     return json;
 };
 
 export const editTask = async (boardId, taskId, data) => {
-    const result = await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}`, {
+    const oldResult = await getTask(boardId, taskId);
+    const oldAttachments = oldResult.attachments;
+    const newAttachments = data.attachments;
+    await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}`, {
         method: 'PUT',
         headers: {
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
@@ -120,8 +123,18 @@ export const editTask = async (boardId, taskId, data) => {
         },
         body: JSON.stringify(data),
     });
-    const json = await result.json();
-    return json;
+    const difference = oldAttachments.filter(x => !newAttachments.some(na => na.name === x.name)).concat(newAttachments.filter(x => !oldAttachments.some(na => na.name === x.name)));
+    const queries = [];
+    difference.forEach(attachment => {
+        if (oldAttachments.some(oa => oa.name === attachment.name)) {
+            //queries.push(removeRoleFromRoleGroup(groupId, id));
+        } else {
+            queries.push(createAttachment(boardId, taskId, attachment.blob));
+        }
+    });
+    await Promise.all(queries);
+    //const json = await result.json();
+    //return json;
 };
 
 export const deleteTask = async (boardId, taskId) => {
@@ -141,7 +154,10 @@ export const getAttachments = async (boardId, taskId, attachmentId) => {
         }
     });
     const blob = await result.blob();
-    return blob;
+    return {
+        id: attachmentId,
+        blob
+    };
 };
 
 export const createAttachment = async (boardId, taskId, data) => {
