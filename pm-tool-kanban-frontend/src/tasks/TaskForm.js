@@ -110,7 +110,11 @@ const TaskForm = (props) => {
     ]);
 
     useEffect(() => {
-        attachments.push(...acceptedFiles);
+        attachments.push(...acceptedFiles.map(file => ({
+            name: file.name,
+            contentType: file.contentType,
+            blob: file
+        })));
         setAttachments(Object.assign([], attachments));
     }, [acceptedFiles]);
 
@@ -285,7 +289,7 @@ const TaskForm = (props) => {
                                             <ul>
                                                 {attachments.map(attachment => (
                                                     <li key={attachment.name}>
-                                                        <a href={'#'/*URL.createObjectURL(attachment)*/}
+                                                        <a href={URL.createObjectURL(attachment.blob)}
                                                            target="_blank">{attachment.name}</a>
                                                     </li>
                                                 ))}
