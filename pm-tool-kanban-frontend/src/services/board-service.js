@@ -78,7 +78,7 @@ export const getTasksAssignedToUser = async (userId) => {
         })));
     }
     return results;
-}
+};
 
 export const getTasks = async (boardId) => {
     const result = await fetch(baseUrl + `/boards/${boardId}/tasks`, {
@@ -89,6 +89,11 @@ export const getTasks = async (boardId) => {
         }
     });
     const json = await result.json();
+    const quaries = [];
+    json.forEach(item => {
+        quaries.push(getTaskStatistic(boardId, item.id, 'TIME_LOGGED'));
+    });
+    json.statistics = await Promise.all(quaries);
     return json;
 };
 
@@ -264,4 +269,15 @@ export const getTaskStatistic = async (boardId, taskId, type) => {
     });
     const json = await result.json();
     return json;
+};
+
+export const logTaskTime = async (boardId, taskId, data) => {
+    const result = await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/logTime`, {
+        method: 'POST',
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
 };
