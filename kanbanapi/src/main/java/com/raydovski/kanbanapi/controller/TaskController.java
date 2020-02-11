@@ -122,6 +122,14 @@ public class TaskController {
         return new ResponseEntity<byte[]>(a.getData(), headers, HttpStatus.OK);
     }
 
+    @DeleteMapping(path = "/{id}/attachments/{attachmentId}")
+    @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Delete attachment")
+    @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")
+    public void deleteAttachment(@PathVariable Long boardId, @PathVariable Long id,
+            @ApiIgnore Authentication authentication, @PathVariable String attachmentId) {
+        this.taskService.deleteAttachment(boardId, id, attachmentId);
+    }
+
     @DeleteMapping("/{id}")
     @ApiOperation(authorizations = @Authorization(value = "Bearer"), value = "Delete task")
     @PreAuthorize(value = "@boardService.isOwner(#authentication.getName(), #boardId) or @boardService.isMember(#authentication.getName(), #boardId)")

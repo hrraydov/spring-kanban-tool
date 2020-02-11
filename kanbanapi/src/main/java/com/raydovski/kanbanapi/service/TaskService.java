@@ -130,6 +130,18 @@ public class TaskService {
         this.taskRepository.save(task);
     }
 
+    public void deleteAttachment(Long boardId, Long taskId, String id) {
+        Task task = this.getEntity(taskId);
+        if (!task.getBoard().getId().equals(boardId)) {
+            throw new EntityNotFoundException();
+        }
+        Attachment att = this.attachmentRepository.findById(id).orElseThrow(EntityNotFoundException::new);
+        if (!att.getTask().getId().equals(taskId)) {
+            throw new EntityNotFoundException();
+        }
+        this.attachmentRepository.delete(att);
+    }
+
     public AttachmentDto getAttachment(Long boardId, Long taskId, String id) {
         Task task = this.getEntity(taskId);
         if (!task.getBoard().getId().equals(boardId)) {
