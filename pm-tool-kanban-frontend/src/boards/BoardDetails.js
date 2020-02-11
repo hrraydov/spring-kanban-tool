@@ -23,6 +23,7 @@ const BoardDetails = (props) => {
     const [board, setBoard] = useState({});
     const [tasks, setTasks] = useState([]);
     const [task, setTask] = useState({});
+    const [statistics, setStatistics] = useState([]);
     const [shouldFetch, setShouldFetch] = useState(true);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
@@ -34,6 +35,8 @@ const BoardDetails = (props) => {
         const func = async () => {
             const board = await getBoard(+boardId);
             const tasks = await getTasks(+boardId);
+
+            console.log(tasks[0]);
 
             setLoading(false);
             setBoard(board);

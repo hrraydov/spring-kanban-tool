@@ -240,10 +240,6 @@ const BoardForm = (props) => {
                                                                                 <Badge pill className="mr-1 d-flex align-items-center">{index + 1}</Badge>
                                                                                 <span className="text-wrap">{phase.name}</span>
                                                                                 <div className="d-flex flex-row justify-content-between ml-1">
-                                                                                    <span className="mr-1" onClick={() => {
-                                                                                        /*editPhase(phase)*/
-                                                                                    }}><i className="fas fa-edit"></i>
-                                                                                    </span>
                                                                                     <span onClick={() => {
                                                                                         const oldValues = Object.assign([], values.phases);
                                                                                         oldValues.splice(index, 1);;

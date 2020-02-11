@@ -17,8 +17,6 @@ import com.raydovski.kanbanapi.dto.AttachmentDto;
 import com.raydovski.kanbanapi.dto.TaskDto;
 import com.raydovski.kanbanapi.dto.TaskHistoryDto;
 import com.raydovski.kanbanapi.dto.TaskSearchDto;
-import com.raydovski.kanbanapi.dto.UserDto;
-import com.raydovski.kanbanapi.entity.Attachment;
 import com.raydovski.kanbanapi.entity.TaskHistoryType;
 import com.raydovski.kanbanapi.service.BoardService;
 import com.raydovski.kanbanapi.service.TaskService;
@@ -27,7 +25,6 @@ import com.raydovski.kanbanapi.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -148,7 +145,9 @@ public class TaskController {
         List<TaskHistoryDto> history = this.taskService.getHistory(boardId, id, type);
         switch (type) {
         case TIME_LOGGED: {
-            return history.stream().mapToLong(x -> Long.valueOf(x.getData().toString())).sum();
+            Map<String, Long> result = new HashMap<>();
+            result.putIfAbsent("loggedTime", history.stream().mapToLong(x -> Long.valueOf(x.getData().toString())).sum());
+            return result;
         }
         case ASSIGNED_TO_CHANGED: {
             Map<String, Long> result = new HashMap<>();
