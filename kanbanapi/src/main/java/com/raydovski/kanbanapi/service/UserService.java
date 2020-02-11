@@ -48,7 +48,16 @@ public class UserService {
     }
 
     public List<UserDto> searchByEmail(String email) {
-        return this.userRepository.findByEmailContaining(email).stream().map(u -> this.convertToDto(u)).collect(Collectors.toList());
+        return this.userRepository.findByEmailContaining(email).stream().map(u -> this.convertToDto(u))
+                .collect(Collectors.toList());
+    }
+
+    public UserDto editUser(Long id, UserDto dto) {
+        User user = this.get(id);
+        user.setFirstName(dto.getFirstName());
+        user.setLastName(dto.getLastName());
+        user = this.userRepository.save(user);
+        return this.convertToDto(user);
     }
 
     public UserDto convertToDto(User user) {
