@@ -127,7 +127,7 @@ const TaskForm = (props) => {
             },
             attachments: attachments
         };
-        console.log(data);
+
         props.onSubmit(data);
     };
 
@@ -255,10 +255,14 @@ const TaskForm = (props) => {
                                         <div className="mt-2">
                                             <h6>Attachments</h6>
                                             <ul>
-                                                {attachments.map(attachment => (
+                                                {attachments.map((attachment, index) => (
                                                     <li key={attachment.name}>
                                                         <a href={URL.createObjectURL(attachment.blob)}
                                                            target="_blank">{attachment.name}</a>
+                                                        <span className="ml-1" onClick={() => {
+                                                            attachments.splice(index, 1);
+                                                            setAttachments(Object.assign([], attachments));
+                                                        }}><i className="fas fa-times"></i></span>
                                                     </li>
                                                 ))}
                                             </ul>

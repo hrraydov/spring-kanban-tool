@@ -151,7 +151,7 @@ export const editTask = async (boardId, taskId, data) => {
     const queries = [];
     difference.forEach(attachment => {
         if (oldAttachments.some(oa => oa.name === attachment.name)) {
-            //queries.push(removeRoleFromRoleGroup(groupId, id));
+            queries.push(deleteAttachment(boardId, taskId, attachment.id));
         } else {
             queries.push(createAttachment(boardId, taskId, attachment.blob));
         }
@@ -159,6 +159,15 @@ export const editTask = async (boardId, taskId, data) => {
     await Promise.all(queries);
     //const json = await result.json();
     //return json;
+};
+
+export const deleteAttachment = async (boardId, taskId, attachmentId) => {
+    await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/attachments/${attachmentId}`, {
+        method: 'DELETE',
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+        },
+    });
 };
 
 export const deleteTask = async (boardId, taskId) => {

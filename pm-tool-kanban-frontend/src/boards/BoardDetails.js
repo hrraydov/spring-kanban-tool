@@ -36,8 +36,6 @@ const BoardDetails = (props) => {
             const board = await getBoard(+boardId);
             const tasks = await getTasks(+boardId);
 
-            console.log(tasks[0]);
-
             setLoading(false);
             setBoard(board);
             setTasks(tasks);
