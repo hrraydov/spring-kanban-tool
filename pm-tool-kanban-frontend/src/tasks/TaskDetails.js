@@ -27,6 +27,8 @@ const TaskDetails = (props) => {
     const {boardId} = props.match.params;
     const {taskId} = props.match.params;
 
+    const fileImgUrl = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMgAAADICAMAAACahl6sAAAAIVBMVEX09PS2trbMzMzo6OjPz8/b29vAwMDu7u7Dw8O4uLje3t6y659EAAABeUlEQVR4nO3c3U7CQBCAUYqI4Ps/sD8FExOdmNnZTjHnJNxu9utOS3rTwwEAAAAAAAAAAODLMuT6/ju/dDd8Gu247qVk7ESW/ZQUdOyj5NuGUiEf87WDktETueX0l9z2cco776NkvaLHgRVOyy6ma53zwZA9lJScyKq3pDCkt6QypLWkNKTzPikN6SypDWksqR2txpLi0eorKR6tvmfXhJCekhkhLSVTQjrukykhHSVzQhpK5oxWQ8mk0dq+ZNJofdi2ZDzk9bf3+OVctss/GA/5yXEdsOJVQzNDluJVQ0JCQvKEhI7rv2LxqiEnEhKSJyQkJE9ISEiekJCQPCEhIXlCQkLyhISE5AkJCckTEhKSJyQkJE9ISEiekJCQPCEhIXlCQkLyhISE5AkJCckTEhKSJyQkJE9ISEiekJCQPCEhIXlCQm0hl+dal2tTSLH7x7oePuRe8vghy/8JuXaFZL9BF+oIKbb9U+tppi1DAAAAAAAAAAAAtvMGsDkRBZH0SJMAAAAASUVORK5CYII=';
+
     useEffect(() => {
         const func = async () => {
             const board = await getBoard(+boardId);
@@ -90,18 +92,14 @@ const TaskDetails = (props) => {
                             {task.attachments?.length !== 0 ? task.attachments?.map(attachment => (
                                     <Card key={attachment.id} className="m-2" style={{maxWidth: '150px'}}>
                                         <a href={URL.createObjectURL(attachment.blob)} target="_blank">
-                                            {
-                                                attachment.contentType.includes('image') ? (
-                                                    <CardImg
-                                                        top
-                                                        style={{width: '150px', height: '150px'}}
-                                                        width="150px"
-                                                        height="150px"
-                                                        src={URL.createObjectURL(attachment.blob)}
-                                                        alt=""
-                                                    />
-                                                ) : ''
-                                            }
+                                            <CardImg
+                                                top
+                                                style={{width: '150px', height: '150px'}}
+                                                width="150px"
+                                                height="150px"
+                                                src={attachment.contentType.includes('image') ? URL.createObjectURL(attachment.blob) : fileImgUrl}
+                                                alt=""
+                                            />
                                         </a>
                                         <CardBody>
                                             <CardText className="d-flex align-items-center">
@@ -155,7 +153,7 @@ const TaskDetails = (props) => {
                     <hr/>
                     <h5 className="bg-primary text-white p-1 rounded shadow-sm">Statistic</h5>
                     {Object.entries(statistic).length !== 0 ? (
-                        <div className="h-50 overflow-auto">
+                        <div className="overflow-auto">
                             <Table striped>
                                 <thead>
                                 <tr>
