@@ -15,7 +15,7 @@ import {
 } from 'reactstrap';
 import AsyncSelect from 'react-select/async';
 import * as Yup from 'yup';
-import { Formik, FieldArray, ErrorMessage, Field } from 'formik';
+import { Formik, ErrorMessage, Field } from 'formik';
 
 const Schema = Yup.object().shape({
     name: Yup.string()

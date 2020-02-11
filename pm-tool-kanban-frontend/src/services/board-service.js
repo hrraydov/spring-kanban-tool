@@ -89,11 +89,6 @@ export const getTasks = async (boardId) => {
         }
     });
     const json = await result.json();
-    const quaries = [];
-    json.forEach(item => {
-        quaries.push(getTaskStatistic(boardId, item.id, 'TIME_LOGGED'));
-    });
-    json.statistics = await Promise.all(quaries);
     return json;
 };
 
@@ -258,6 +253,17 @@ export const getUser = async (email) => {
     return json;
 };
 
+export const editUser = async (data) => {
+    await fetch(baseUrl + `/users`, {
+        method: 'PUT',
+        headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    });
+};
+
 export const getTaskHistory = async (boardId, taskId, type) => {
     const result = await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/history?type=${type}`, {
         method: 'GET',
@@ -281,7 +287,7 @@ export const getTaskStatistic = async (boardId, taskId, type) => {
 };
 
 export const logTaskTime = async (boardId, taskId, data) => {
-    const result = await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/logTime`, {
+    await fetch(baseUrl + `/boards/${boardId}/tasks/${taskId}/logTime`, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('token'))}`,

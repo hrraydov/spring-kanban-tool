@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Container, Row, Col, ListGroup, ListGroupItem} from 'reactstrap';
+import {Container, Row, Col, ListGroup} from 'reactstrap';
 import {getBoards, getTasksAssignedToUser} from '../services/board-service';
 import useUser from '../hooks/useUser';
 import {Link} from 'react-router-dom';

@@ -23,7 +23,6 @@ const BoardDetails = (props) => {
     const [board, setBoard] = useState({});
     const [tasks, setTasks] = useState([]);
     const [task, setTask] = useState({});
-    const [statistics, setStatistics] = useState([]);
     const [shouldFetch, setShouldFetch] = useState(true);
     const [loading, setLoading] = useState(true);
     const [openModal, setOpenModal] = useState(false);
@@ -156,7 +155,7 @@ const BoardDetails = (props) => {
                             <Row>
                                 {
                                     board.phases?.map(phase => (
-                                        <Col key={phase.id} /*md={Math.floor(12 / board.phases.length)}*/ >
+                                        <Col key={phase.id} >
                                             <span className="text-uppercase">{phase.name}</span>
                                         </Col>
                                     ))
@@ -167,7 +166,6 @@ const BoardDetails = (props) => {
                                     board.phases?.map(phase => (
                                         <Col className="p-2"
                                              key={phase.id}
-                                             /*md={Math.floor(12 / board.phases.length)}*/
                                              onDragOver={(e) => {
                                                  onDragOver(e);
                                              }}
@@ -224,18 +222,6 @@ const BoardDetails = (props) => {
                                                                         <small>
                                                                             <span className="mr-1">Assigned to:</span>
                                                                             <span className="text-wrap">{task.assignedTo.email}</span>
-                                                                        </small>
-                                                                    </Col>
-                                                                </Row>
-                                                                <Row>
-                                                                    <Col md={12} className="ml-1 mb-1" onClick={() => handleTaskDetails(task.id)}>
-                                                                        <small>
-                                                                            <span className="mr-1">
-                                                                                Logged time:
-                                                                            </span>
-                                                                            <span className="text-wrap">
-                                                                                {task.description === '' ? 'No logged time' : 'No logged time'}
-                                                                            </span>
                                                                         </small>
                                                                     </Col>
                                                                 </Row>

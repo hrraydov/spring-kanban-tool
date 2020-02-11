@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Container, Row, Col, Card, CardImg, CardBody, Modal, ModalHeader, ModalBody} from 'reactstrap';
-import {userInfo} from "../services/board-service";
+import {userInfo, editUser} from "../services/board-service";
 import UserDetailsForm from "./UserDetailsForm";
 import useUser from "../hooks/useUser";
 
@@ -32,7 +32,14 @@ const UserDetails = (props) => {
     }, [props.match.params, user, shouldFetch]);
 
     const handleSubmit = (data) => {
-        console.log(data);
+
+        editUser(data)
+            .then(res => {
+                setOpenModal(false);
+                setShouldFetch(true);
+            }).catch(err => {
+            console.error(err);
+        });
     };
 
     const renderModal = () => {
